@@ -16,6 +16,7 @@ public class EventHandler : MonoBehaviour
     [SerializeField] int currency;
     [SerializeField] float launchForce;
     [SerializeField] Vector2 spawn;
+    [SerializeField] Animator anim;
 
     // Event Handler Hiddens
     float runTimer;
@@ -23,13 +24,13 @@ public class EventHandler : MonoBehaviour
     int timeExtension;
     int maxLevel;
     PlayerController player;
-    Dictionary<Upgrades, int> upgradeLevels = new Dictionary<Upgrades, int>();
+    public Dictionary<Upgrades, int> upgradeLevels = new Dictionary<Upgrades, int>();
 
     // Upgrades
-    Stack<int> horsepowers = new Stack<int>(new int[] {300, 350, 400});
-    Stack<int> flexibilities = new Stack<int>(new int[] {20, 25, 30});
-    Stack<int> torques = new Stack<int>(new int[] {15, 20, 25});
-    Stack<int> timeExtensions = new Stack<int>(new int[] {15, 25, 30});
+    Stack<int> horsepowers = new Stack<int>(new int[] {380, 330, 280});
+    Stack<int> flexibilities = new Stack<int>(new int[] {30, 25, 20});
+    Stack<int> torques = new Stack<int>(new int[] {25, 20, 15});
+    Stack<int> timeExtensions = new Stack<int>(new int[] {25, 20, 15});
 
     // Sets up all initial values
     private void Start()
@@ -44,7 +45,7 @@ public class EventHandler : MonoBehaviour
         player = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerController>();
         runTimer = 0;
         runDistance = 0;
-        currency = 0;
+        //currency = 0;
         timeExtension = 10;
         maxLevel = 3;
     }
@@ -93,10 +94,12 @@ public class EventHandler : MonoBehaviour
         upgradeLevels.TryGetValue(upgrade, out int upgradeLevel);
         if (upgradeLevel < maxLevel && RemoveCurrency(GetPrice(upgradeLevel)))
         {
+            anim.SetTrigger("SuccesfulPurchase");
             Upgrade(upgrade);
             return true;
         }
         return false;
+        //TODO: Shopkeep animation
     }
 
     // Gets the price for the corresponding level
@@ -108,25 +111,30 @@ public class EventHandler : MonoBehaviour
     // Upgrades the corresponding characteristic
     void Upgrade(Upgrades upgrade)
     {
-        switch (upgrade)
-        {
-            case Upgrades.Horsepower:
-                if (horsepowers.Count > 0)
-                    player.horsepower = horsepowers.Pop();
-                break;
-            case Upgrades.Flexibility:
-                if (flexibilities.Count > 0)
-                    player.flexibility = flexibilities.Pop();
-                break;
-            case Upgrades.Torque:
-                if (torques.Count > 0)
-                    player.torque = torques.Pop();
-                break;
-            case Upgrades.Time:
-                if (timeExtensions.Count > 0)
-                    timeExtension = timeExtensions.Pop();
-                break;
+        if (upgradeLevels.TryGetValue(upgrade, out int level)){
+            upgradeLevels[upgrade] = level + 1;
+            switch (upgrade)
+            {
+                case Upgrades.Horsepower:
+                    if (horsepowers.Count > 0)
+                        Debug.Log(horsepowers.Peek());
+                        player.horsepower = horsepowers.Pop();
+                    break;
+                case Upgrades.Flexibility:
+                    if (flexibilities.Count > 0)
+                        player.flexibility = flexibilities.Pop();
+                    break;
+                case Upgrades.Torque:
+                    if (torques.Count > 0)
+                        player.torque = torques.Pop();
+                    break;
+                case Upgrades.Time:
+                    if (timeExtensions.Count > 0)
+                        timeExtension = timeExtensions.Pop();
+                    break;
+            }
         }
+        
     }
 
     void ResetRun() 
