@@ -4,21 +4,23 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
+    // Upgradeables
+    public float horsepower; // Formerly jumpPower
+    public float flexibility; // Formerly maxRotationAngle
+    public float torque; // Formerly rotationSpeed
+
     // Player Fields
     [SerializeField] bool movementEnabled;
-    [SerializeField] float jumpPower;
-    [SerializeField] float maxRotationAngle;
-    [SerializeField] float rotationSpeed;
     [SerializeField] float jumpDelay; // in seconds
     [SerializeField] Transform top;
     [SerializeField] Transform bottom;
+    [SerializeField] float centerOfMass;
 
     // Player Hiddens
     bool jumpIntent;
     float moveDirection;
-    Rigidbody2D rb;
     float jumpTimer;
-    
+    Rigidbody2D rb;
 
     // Start is called before the first frame update
     void Start()
@@ -27,6 +29,7 @@ public class PlayerController : MonoBehaviour
         movementEnabled = true;
         jumpIntent = false;
         rb = GetComponent<Rigidbody2D>();
+        rb.centerOfMass = Vector2.up * centerOfMass;
         jumpTimer = jumpDelay;
         moveDirection = 0;
     }
@@ -62,13 +65,13 @@ public class PlayerController : MonoBehaviour
     private void Move() 
     {
         // Uses the intended movement direction to determine the angle of the next bend.
-        float targetRotation = bottom.localRotation.eulerAngles.z + rotationSpeed * moveDirection;
+        float targetRotation = bottom.localRotation.eulerAngles.z + torque * moveDirection;
 
         // Bounds the bending to within maxRotation in either direction.
-        if (maxRotationAngle < targetRotation && targetRotation < 180f)
-            targetRotation = maxRotationAngle;
-        else if (180f < targetRotation && targetRotation < 360f - maxRotationAngle)
-            targetRotation = 360f - maxRotationAngle;
+        if (flexibility < targetRotation && targetRotation < 180f)
+            targetRotation = flexibility;
+        else if (180f < targetRotation && targetRotation < 360f - flexibility)
+            targetRotation = 360f - flexibility;
 
         // Executes the movement instructions on the top and bottom half of the character.
         top.localRotation = Quaternion.Euler(0f, 0f, 360f- targetRotation);
@@ -91,9 +94,9 @@ public class PlayerController : MonoBehaviour
                 if (intentDirection != 0)
                 {
                     direction = (((intentDirection > 0) ? -1 : 1) * Vector2.left + direction).normalized;
-                    rb.angularVelocity += jumpPower * ((intentDirection > 0) ? -1 : 1);
+                    rb.angularVelocity += horsepower * ((intentDirection > 0) ? -1 : 1);
                 }
-                rb.AddForce(direction * jumpPower);
+                rb.AddForce(direction * horsepower);
 
                 // Decrements relevant trackers on a successful jump attempt.
                 jumpTimer = 0;
@@ -103,14 +106,19 @@ public class PlayerController : MonoBehaviour
     }
 
     // Disallows the player from moving
-    private void DisableMovement() 
+    public void DisableMovement() 
     {
         movementEnabled = false;
     }
 
     // Allows the player to move
-    private void EnableMovement() 
+    public void EnableMovement() 
     {
         movementEnabled = true;
+    }
+
+    public void Launch(Vector2 direction) 
+    {
+        rb.AddForce(direction);
     }
 }
