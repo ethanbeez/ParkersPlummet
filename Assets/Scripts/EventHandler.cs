@@ -23,7 +23,7 @@ public class EventHandler : MonoBehaviour
     int timeExtension;
     int maxLevel;
     PlayerController player;
-    Dictionary<Upgrades, int> upgradeLevels = new Dictionary<Upgrades, int>();
+    public Dictionary<Upgrades, int> upgradeLevels = new Dictionary<Upgrades, int>();
 
     // Upgrades
     Stack<int> horsepowers = new Stack<int>(new int[] {300, 350, 400});
