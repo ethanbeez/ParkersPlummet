@@ -9,20 +9,6 @@ public class LevelLoader : MonoBehaviour
 
     [SerializeField] float transitionTime;
 
-    // Update is called once per frame
-    //void Update()
-    //{
-    //    if (Input.GetKeyDown(KeyCode.Tab)) 
-    //    {
-    //        LoadNextLevel();
-    //    }
-
-    //    if (Input.GetKeyDown(KeyCode.Backspace)) 
-    //    {
-    //        ReplayTransition();        
-    //    }
-    //}
-
     public void LoadNextLevel() 
     {
         StartCoroutine(LoadLevel(SceneManager.GetActiveScene().buildIndex + 1));

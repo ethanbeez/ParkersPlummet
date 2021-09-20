@@ -21,6 +21,7 @@ public class PlayerController : MonoBehaviour
     float moveDirection;
     float jumpTimer;
     Rigidbody2D rb;
+    AudioSource audio;
 
     // Start is called before the first frame update
     void Start()
@@ -32,6 +33,7 @@ public class PlayerController : MonoBehaviour
         rb.centerOfMass = Vector2.up * centerOfMass;
         jumpTimer = jumpDelay;
         moveDirection = 0;
+        audio = GetComponent<AudioSource>();
     }
     
     // Update is called on every frame.
@@ -100,6 +102,9 @@ public class PlayerController : MonoBehaviour
 
                 // Decrements relevant trackers on a successful jump attempt.
                 jumpTimer = 0;
+
+                //Plays jump audio file.
+                audio.Play(0);
             }
             jumpIntent = false;
         }

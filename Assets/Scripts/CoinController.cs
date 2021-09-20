@@ -5,6 +5,7 @@ using UnityEngine;
 public class CoinController : MonoBehaviour
 {
     [SerializeField] int value;
+    [SerializeField] AudioSource audio;
     EventHandler eHandler;
 
     private void Start()
@@ -15,6 +16,7 @@ public class CoinController : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
+        audio.Play();
         eHandler.AddCurrency(value);
         Destroy(gameObject);
     }

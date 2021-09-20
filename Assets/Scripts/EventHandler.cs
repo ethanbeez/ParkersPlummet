@@ -13,12 +13,17 @@ public class EventHandler : MonoBehaviour
     }
 
     // Fields
-    [SerializeField] int currency;
-    [SerializeField] float launchForce;
+    public int currency;
+    public float runTimer;
+    public bool inRun;
+    [SerializeField] LevelLoader loader;
+    [SerializeField] GameObject shopUI;
+    [SerializeField] GameObject timeUI;
     [SerializeField] Vector2 spawn;
+    [SerializeField] Animator anim;
+    [SerializeField] List<AudioSource> audioSources;
 
     // Event Handler Hiddens
-    float runTimer;
     int runDistance;
     int timeExtension;
     int maxLevel;
@@ -26,10 +31,10 @@ public class EventHandler : MonoBehaviour
     public Dictionary<Upgrades, int> upgradeLevels = new Dictionary<Upgrades, int>();
 
     // Upgrades
-    Stack<int> horsepowers = new Stack<int>(new int[] {300, 350, 400});
-    Stack<int> flexibilities = new Stack<int>(new int[] {20, 25, 30});
-    Stack<int> torques = new Stack<int>(new int[] {15, 20, 25});
-    Stack<int> timeExtensions = new Stack<int>(new int[] {15, 25, 30});
+    Stack<int> horsepowers = new Stack<int>(new int[] {380, 330, 280});
+    Stack<int> flexibilities = new Stack<int>(new int[] {30, 25, 20});
+    Stack<int> torques = new Stack<int>(new int[] {25, 20, 15});
+    Stack<int> timeExtensions = new Stack<int>(new int[] {25, 20, 15});
 
     // Sets up all initial values
     private void Start()
@@ -42,19 +47,25 @@ public class EventHandler : MonoBehaviour
 
         // Other Hiddens
         player = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerController>();
-        runTimer = 0;
         runDistance = 0;
-        currency = 0;
         timeExtension = 10;
         maxLevel = 3;
+        inRun = false;
+
+        // Start shop music
+        audioSources[0].Play();
     }
 
     // Checks for status updates once per frame
     private void Update()
     {
         // Increment Timers
-        runTimer += Time.deltaTime;
-        runDistance = -(int)player.transform.position.y;
+        runTimer -= Time.deltaTime;
+        runDistance = (int)(new Vector2(player.transform.position.x, player.transform.position.y).magnitude);
+
+        // Check fail condition
+        if (runTimer < 0 && inRun)
+            EngageFailState();
     }
 
     // Tries to add currency
@@ -93,10 +104,12 @@ public class EventHandler : MonoBehaviour
         upgradeLevels.TryGetValue(upgrade, out int upgradeLevel);
         if (upgradeLevel < maxLevel && RemoveCurrency(GetPrice(upgradeLevel)))
         {
+            anim.SetTrigger("SuccesfulPurchase");
             Upgrade(upgrade);
             return true;
         }
         return false;
+        //TODO: Shopkeep animation
     }
 
     // Gets the price for the corresponding level
@@ -108,48 +121,68 @@ public class EventHandler : MonoBehaviour
     // Upgrades the corresponding characteristic
     void Upgrade(Upgrades upgrade)
     {
-        switch (upgrade)
-        {
-            case Upgrades.Horsepower:
-                if (horsepowers.Count > 0)
-                    player.horsepower = horsepowers.Pop();
-                break;
-            case Upgrades.Flexibility:
-                if (flexibilities.Count > 0)
-                    player.flexibility = flexibilities.Pop();
-                break;
-            case Upgrades.Torque:
-                if (torques.Count > 0)
-                    player.torque = torques.Pop();
-                break;
-            case Upgrades.Time:
-                if (timeExtensions.Count > 0)
-                    timeExtension = timeExtensions.Pop();
-                break;
+        if (upgradeLevels.TryGetValue(upgrade, out int level)){
+            upgradeLevels[upgrade] = level + 1;
+            switch (upgrade)
+            {
+                case Upgrades.Horsepower:
+                    if (horsepowers.Count > 0)
+                        Debug.Log(horsepowers.Peek());
+                        player.horsepower = horsepowers.Pop();
+                    break;
+                case Upgrades.Flexibility:
+                    if (flexibilities.Count > 0)
+                        player.flexibility = flexibilities.Pop();
+                    break;
+                case Upgrades.Torque:
+                    if (torques.Count > 0)
+                        player.torque = torques.Pop();
+                    break;
+                case Upgrades.Time:
+                    if (timeExtensions.Count > 0)
+                        timeExtension = timeExtensions.Pop();
+                    break;
+            }
         }
+        
     }
 
-    void ResetRun() 
+    public void ResetRun() 
     {
-        // reset player transform
-        player.transform.position = spawn;
-        // Enable UI
+        StartCoroutine(ReturnToShop());
     }
 
-    void StartRun()
+    public void StartRun()
     {
-        // Disable UI
-        player.Launch(Vector2.right * launchForce);
-        // Might need to wait to avoid shop collisions
-        player.EnableMovement();
+        audioSources[0].Stop();
+        audioSources[1].Play();
+        shopUI.SetActive(false);
+        timeUI.SetActive(true);
+        runTimer = 30 + timeExtension; // magic number
+        inRun = true;
     }
 
-    void EngageFailState()
+    public void EngageFailState()
     {
-        player.DisableMovement();
+        inRun = false;
         AddCurrency(runDistance);
-        // TODO:: Play wizard hand animation
-        // TODO:: Play reset screen animation
         ResetRun();
+    }
+
+    IEnumerator ReturnToShop() 
+    {
+        loader.ReplayTransition();
+        timeUI.SetActive(false);
+        audioSources[1].Stop();
+        audioSources[0].Play();
+        yield return new WaitForSeconds(1.5f);
+        player.transform.position = spawn;
+        shopUI.SetActive(true);
+    }
+
+    public void ExtendTime() 
+    {
+        Debug.Log("Extend");
+        runTimer += timeExtension;
     }
 }

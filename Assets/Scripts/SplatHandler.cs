@@ -6,10 +6,12 @@ public class SplatHandler : MonoBehaviour
 {
     [SerializeField] Animator anim;
     [SerializeField] EndCardController ECC;
+    [SerializeField] AudioSource audio;
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
         anim.SetTrigger("Splat");
-        //ECC.goToCredits(); // 7 second hold
+        audio.Play();
+        ECC.GoToCredits();
     }
 }

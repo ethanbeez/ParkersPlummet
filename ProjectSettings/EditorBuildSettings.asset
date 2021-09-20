@@ -12,8 +12,8 @@ EditorBuildSettings:
     path: Assets/Scenes/TitleCard.unity
     guid: 760190a99ac73ff43ab622d0143280a3
   - enabled: 1
-    path: Assets/Scenes/ControlsTestScene.unity
-    guid: ad79d7e581977e343b88eb8e215eab1e
+    path: Assets/Scenes/Level1.unity
+    guid: 36bb34df180fe81478514352a7040690
   - enabled: 1
     path: Assets/Scenes/EndCard.unity
     guid: 823688f133f1a4746bb56bd534811137

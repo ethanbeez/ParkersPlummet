@@ -1,3 +1,4 @@
+  
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -13,8 +14,9 @@ public class TooltipSystem : MonoBehaviour
         current = this;
     }
 
-    public static void Show()
+    public static void Show(string header, string content = "")
     {
+        current.tooltip.SetText(header, content);
         current.tooltip.gameObject.SetActive(true);
     }
 

@@ -4,20 +4,19 @@ using UnityEngine;
 
 public class EndCardController : MonoBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
+    [SerializeField] LevelLoader loader;
+    [SerializeField] GameObject credits;
 
     public void GoToCredits() 
     {
-        
+        StartCoroutine(transition());
+    }
+
+    IEnumerator transition() 
+    {
+        yield return new WaitForSeconds(7);
+        loader.ReplayTransition();
+        yield return new WaitForSeconds(1.5f);
+        credits.SetActive(true);
     }
 }
