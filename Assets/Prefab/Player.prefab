@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 8687387189750966583}
   - component: {fileID: 8687387189750966580}
   m_Layer: 0
-  m_Name: parkerBottom
+  m_Name: Bottom_Model
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -113,7 +113,6 @@ Transform:
   m_Children:
   - {fileID: 8687387190552774515}
   - {fileID: 8687387190174854280}
-  - {fileID: 8687387190710638644}
   - {fileID: 8687387191149632599}
   m_Father: {fileID: 0}
   m_RootOrder: 0
@@ -280,7 +279,7 @@ GameObject:
   - component: {fileID: 8687387190206357521}
   - component: {fileID: 8687387190206357742}
   m_Layer: 0
-  m_Name: parkerTop (1)
+  m_Name: Top_Model
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -487,10 +486,10 @@ Transform:
   m_GameObject: {fileID: 8687387190710638647}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 1.4285713, y: 2.5, z: 1}
   m_Children: []
-  m_Father: {fileID: 8687387189847150588}
-  m_RootOrder: 2
+  m_Father: {fileID: 8687387191149632599}
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &8687387190710638645
 SpriteRenderer:
@@ -570,9 +569,10 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 0.7, y: 0.4, z: 1}
-  m_Children: []
+  m_Children:
+  - {fileID: 8687387190710638644}
   m_Father: {fileID: 8687387189847150588}
-  m_RootOrder: 3
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!61 &8687387191149632596
 BoxCollider2D:

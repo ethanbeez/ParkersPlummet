@@ -13,13 +13,17 @@ public class EventHandler : MonoBehaviour
     }
 
     // Fields
-    [SerializeField] int currency;
-    [SerializeField] float launchForce;
+    public int currency;
+    public float runTimer;
+    public bool inRun;
+    [SerializeField] LevelLoader loader;
+    [SerializeField] GameObject shopUI;
+    [SerializeField] GameObject timeUI;
     [SerializeField] Vector2 spawn;
     [SerializeField] Animator anim;
+    [SerializeField] List<AudioSource> audioSources;
 
     // Event Handler Hiddens
-    float runTimer;
     int runDistance;
     int timeExtension;
     int maxLevel;
@@ -43,19 +47,25 @@ public class EventHandler : MonoBehaviour
 
         // Other Hiddens
         player = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerController>();
-        runTimer = 0;
         runDistance = 0;
-        //currency = 0;
         timeExtension = 10;
         maxLevel = 3;
+        inRun = false;
+
+        // Start shop music
+        audioSources[0].Play();
     }
 
     // Checks for status updates once per frame
     private void Update()
     {
         // Increment Timers
-        runTimer += Time.deltaTime;
-        runDistance = -(int)player.transform.position.y;
+        runTimer -= Time.deltaTime;
+        runDistance = (int)(new Vector2(player.transform.position.x, player.transform.position.y).magnitude);
+
+        // Check fail condition
+        if (runTimer < 0 && inRun)
+            EngageFailState();
     }
 
     // Tries to add currency
@@ -137,27 +147,42 @@ public class EventHandler : MonoBehaviour
         
     }
 
-    void ResetRun() 
+    public void ResetRun() 
     {
-        // reset player transform
-        player.transform.position = spawn;
-        // Enable UI
+        StartCoroutine(ReturnToShop());
     }
 
-    void StartRun()
+    public void StartRun()
     {
-        // Disable UI
-        player.Launch(Vector2.right * launchForce);
-        // Might need to wait to avoid shop collisions
-        player.EnableMovement();
+        audioSources[0].Stop();
+        audioSources[1].Play();
+        shopUI.SetActive(false);
+        timeUI.SetActive(true);
+        runTimer = 30 + timeExtension; // magic number
+        inRun = true;
     }
 
-    void EngageFailState()
+    public void EngageFailState()
     {
-        player.DisableMovement();
+        inRun = false;
         AddCurrency(runDistance);
-        // TODO:: Play wizard hand animation
-        // TODO:: Play reset screen animation
         ResetRun();
+    }
+
+    IEnumerator ReturnToShop() 
+    {
+        loader.ReplayTransition();
+        timeUI.SetActive(false);
+        audioSources[1].Stop();
+        audioSources[0].Play();
+        yield return new WaitForSeconds(1.5f);
+        player.transform.position = spawn;
+        shopUI.SetActive(true);
+    }
+
+    public void ExtendTime() 
+    {
+        Debug.Log("Extend");
+        runTimer += timeExtension;
     }
 }
